@@ -69,7 +69,7 @@ class ManuallyDrop {
     }
 
 
-    // Just in case!
+    // TODO: SUPPORT THESE
     ManuallyDrop(T&&) = delete;
     ManuallyDrop(const T&) = delete;
     ManuallyDrop&operator=(T&&) = delete;
