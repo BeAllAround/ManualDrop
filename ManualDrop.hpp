@@ -1,0 +1,113 @@
+// NOTE: In case, some compilers don't support always_inline as the same macro
+#define __force_inline __attribute__((always_inline))
+
+template<class T>
+class ManuallyDrop {
+    public:
+        union U{
+
+            T t;
+
+            U() __force_inline
+            {
+
+            }
+
+            ~U() __force_inline
+            {
+            }
+
+        } u;
+
+    ManuallyDrop() __force_inline
+    {
+        new (&u.t) T();
+        // Due to
+        /*
+        // valgrind -s --track-origins=yes ./out.out
+        ==18468== 1 errors in context 1 of 1:
+        ==18468== Conditional jump or move depends on uninitialised value(s)
+        ==18468==    at 0x10945D: main (in /home/alex/Project/ManualDrop/out.out)
+        ==18468==  Uninitialised value was created by a stack allocation
+        ==18468==    at 0x109344: main (in /home/alex/Project/ManualDrop/out.out)
+        */
+    }
+
+    // NOTE: Making this constructor explicit so as not to conflict with the copy/move constructor below
+    template <typename... Args>
+    explicit ManuallyDrop(Args &&...args)
+    {
+        new(&u.t) T(std::forward<Args>(args)...);
+    }
+
+
+    ManuallyDrop(const ManuallyDrop<T>& other) {
+        new(&u.t) T(other.u.t);
+    }
+
+    ManuallyDrop(ManuallyDrop<T> && other) {
+        new(&u.t) T(std::move(other.u.t));
+    }
+
+    ManuallyDrop& operator=(const ManuallyDrop<T> & other) {
+        // Equivalent to the respective operator=(const T&)
+        u.t.~T(); // TODO: Should this actually be allowed?
+
+        new(&u.t) T(other.u.t);
+
+
+        return *this;
+    }
+
+    ManuallyDrop& operator=(ManuallyDrop<T> && other) {
+        // Equivalent to the respective operator=(T&&)
+        u.t.~T(); // TODO: Should this actually be allowed?
+
+        new(&u.t) T(std::move(other));
+
+        return *this;
+    }
+
+
+    // Just in case!
+    ManuallyDrop(T&&) = delete;
+    ManuallyDrop(const T&) = delete;
+    ManuallyDrop&operator=(T&&) = delete;
+    ManuallyDrop&operator=(const T&) = delete;
+
+    /*
+    operator T&(){
+        return u.t;
+    }
+    */
+    // For implictly adopting T into the RAII: "T t = std::move(resource);""
+    operator T&&(){
+        return std::move(u.t);
+    }
+
+    /*
+    const T& get_resource() {
+        return u.t;
+    }
+    */
+
+    T& get_resource() {
+        return u.t;
+    }
+
+    T* get_resource_as_pointer() {
+        return &u.t;
+    }
+
+
+    void restore() __force_inline
+    {
+        u.t.~T();
+    }
+
+    ~ManuallyDrop() __force_inline
+    {
+
+    }
+
+};

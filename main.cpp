@@ -1,73 +1,13 @@
 
-#include <cstddef>
 #include <iostream>
 
-
-// NOTE: In case, some compilers don't support always_inline as the same macro
-#define __force_inline __attribute__((always_inline))
-
-template<class T>
-class ManuallyDrop {
-    public:
-        union U{
-
-            T t;
-
-            U() __force_inline
-            {
-
-            }
-
-            ~U() __force_inline
-            {
-            }
-
-        } u;
-
-    template <typename... Args>
-    ManuallyDrop(Args &&...args)
-    {
-        new(&u.t) T(std::forward<Args>(args)...);
-    }
+#include <cstddef>
+#include <cassert>
 
 
-    ManuallyDrop(const ManuallyDrop& other) {
-        new(u.t) T(other);
-    }
-
-    ManuallyDrop(ManuallyDrop&& other) {
-        new(u.t) T(std::move(other));
-    }
-
-    ManuallyDrop& operator=(const ManuallyDrop& other) {
-        // Equivalent to the respective operator=(const T&)
-        u.t.~T();
-        new(u.t) T(other);
+#include "ManualDrop.hpp"
 
 
-        return *this;
-    }
-
-    ManuallyDrop& operator=(ManuallyDrop&& other) {
-        // Equivalent to the respective operator=(T&&)
-        u.t.~T();
-        new(u.t) T(std::move(other));
-
-        return *this;
-    }
-
-
-    void restore() __force_inline
-    {
-        u.t.~T();
-    }
-
-    ~ManuallyDrop() __force_inline
-    {
-
-    }
-
-};
 
 class S {
   public:
@@ -126,11 +66,147 @@ class S {
   }
 };
 
+#define _LOGS_VERBOSE
+
+int _block_print(const std::string& block_name) {
+    #ifdef _LOGS_VERBOSE
+    std::cout << "Testing " << block_name << " Block" << std::endl;
+    #endif
+
+    return 0;
+}
+
+int _defer_block_print(const std::string& block_name) {
+    #ifdef _LOGS_VERBOSE
+    std::cout << "Finished " << block_name << " Block" << std::endl;
+    #endif
+
+    return 0;
+}
+
+#define assertm(msg, exp) assert((void(msg), exp))
+
+#define TEST_BLOCK(block_name) for(int i = _block_print(block_name); i < 1; i++, _defer_block_print(block_name))
+
     
 int main(){
-    {
+
+    TEST_BLOCK("Basic Tests | Implicit Destruction Disabled") {
+
+      int* s_p_i { nullptr };
+      int* s1_p_i { nullptr };
+
+      {
         ManuallyDrop<S> s;
         ManuallyDrop<S> s1 (1);
+
+        s_p_i = s.get_resource_as_pointer()->i_ptr;
+
+        s1_p_i = s1.get_resource_as_pointer()->i_ptr;
+
+      }
+
+      assertm(
+        "Detached on-heap members of S not cleaned up", 
+        s_p_i == nullptr &&
+        *(s1_p_i) == 1
+      );
+
+      delete s1_p_i;
+
+
+    }
+
+
+    TEST_BLOCK("C++ Semantics") {
+
+      TEST_BLOCK("Copy Constructor") {
+        ManuallyDrop<S> s (1);
+        ManuallyDrop<S> s1 = s;
+
+        assertm(
+          "Copy OK",
+          s.get_resource_as_pointer() != s1.get_resource_as_pointer() &&
+          s.get_resource_as_pointer()->i_ptr != s1.get_resource_as_pointer()->i_ptr &&
+          *(s.get_resource_as_pointer()->i_ptr) == *(s1.get_resource_as_pointer()->i_ptr)
+        );
+
+        s.restore();
+        s1.restore();
+
+      }
+
+      TEST_BLOCK("Copy Assignment") {
+        ManuallyDrop<S> s;
+        ManuallyDrop<S> s1 (1);
+
+        s = s1;
+
+        assertm(
+          "Copy OK",
+          s.get_resource_as_pointer() != s1.get_resource_as_pointer() &&
+          s.get_resource_as_pointer()->i_ptr != s1.get_resource_as_pointer()->i_ptr &&
+          *(s.get_resource_as_pointer()->i_ptr) == *(s1.get_resource_as_pointer()->i_ptr)
+        );
+
+        s.restore();
+        s1.restore();
+
+      }
+
+
+      TEST_BLOCK("Move Constructor") {
+        ManuallyDrop<S> s (1);
+        ManuallyDrop<S> s1 = std::move(s);
+
+        assertm(
+          "Move OK",
+          s.get_resource_as_pointer() != s1.get_resource_as_pointer() &&
+          s.get_resource_as_pointer()->i_ptr == nullptr && // i_ptr moved
+          s1.get_resource_as_pointer()->i_ptr != nullptr &&
+          *(s1.get_resource_as_pointer()->i_ptr) == 1
+        );
+
+        // s.restore(); // NOT NEEDED ESSENTIALLY AS IT IS MOVED INTO s1
+        s1.restore();
+
+      }
+
+      TEST_BLOCK("Move Assignment") {
+        ManuallyDrop<S> s;
+        ManuallyDrop<S> s1 (1);
+
+        s = std::move(s1);
+
+        assertm(
+          "Move OK",
+          s.get_resource_as_pointer() != s1.get_resource_as_pointer() &&
+          s1.get_resource_as_pointer()->i_ptr == nullptr && // i_ptr moved
+          s.get_resource_as_pointer()->i_ptr != nullptr &&
+          *(s.get_resource_as_pointer()->i_ptr) == 1
+        );
+
+        // s1.restore(); // NOT NEEDED ESSENTIALLY AS IT IS MOVED INTO s
+        s.restore();
+
+      }
+
+      TEST_BLOCK("Adopt the RAII into another entity OK") {
+        ManuallyDrop<S> s (1);
+        S s1 = std::move(s); // operator T&&() Triggered here
+
+        assertm(
+          "Move OK",
+          s.get_resource_as_pointer()->i_ptr == nullptr && // i_ptr moved
+          s1.i_ptr != nullptr &&
+          *(s1.i_ptr) == 1
+        );
+
+
+        // Implicit s1.~S() invoked
+        // Thus, s.restore() is not needed
+
+      }
 
     }
 
