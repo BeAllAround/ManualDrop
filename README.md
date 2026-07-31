@@ -20,7 +20,7 @@ For example,
   /*
   S(int)
   S(S&&)
-  ~S() // Only one destructor invoked of the ~std::vector<S> "RAII" as the s is guareeted to be moved
+  ~S() // Only one destructor invoked by the ~std::vector<S>() "RAII" as the s is guareeted to be moved
   */
 }
 ```
