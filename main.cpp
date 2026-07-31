@@ -112,6 +112,7 @@ int main(){
         *(s1_p_i) == 1
       );
 
+      // Heap deallocation of the detached int*
       delete s1_p_i;
 
 
@@ -137,20 +138,44 @@ int main(){
       }
 
       TEST_BLOCK("Copy Assignment") {
-        ManuallyDrop<S> s;
-        ManuallyDrop<S> s1 (1);
+        {
 
-        s = s1;
+          ManuallyDrop<S> s;
+          ManuallyDrop<S> s1 (1);
 
-        assertm(
-          "Copy OK",
-          s.get_resource_as_pointer() != s1.get_resource_as_pointer() &&
-          s.get_resource_as_pointer()->i_ptr != s1.get_resource_as_pointer()->i_ptr &&
-          *(s.get_resource_as_pointer()->i_ptr) == *(s1.get_resource_as_pointer()->i_ptr)
-        );
+          s = s1;
 
-        s.restore();
-        s1.restore();
+          assertm(
+            "Copy OK",
+            s.get_resource_as_pointer() != s1.get_resource_as_pointer() &&
+            s.get_resource_as_pointer()->i_ptr != s1.get_resource_as_pointer()->i_ptr &&
+            *(s.get_resource_as_pointer()->i_ptr) == *(s1.get_resource_as_pointer()->i_ptr)
+          );
+
+          s.restore();
+          s1.restore();
+        }
+
+
+        {
+          ManuallyDrop<S> s (2);
+          ManuallyDrop<S> s1 (1);
+
+          // RESTORE REQUIRED BEFORE COPY/MOVE ASSIGNMENT SINCE THERE IS NO IMPLICIT DESTRUCTION
+          s.restore(); 
+          s = s1;
+
+          assertm(
+            "Copy OK",
+            s.get_resource_as_pointer() != s1.get_resource_as_pointer() &&
+            s.get_resource_as_pointer()->i_ptr != s1.get_resource_as_pointer()->i_ptr &&
+            *(s.get_resource_as_pointer()->i_ptr) == *(s1.get_resource_as_pointer()->i_ptr)
+          );
+
+          s.restore();
+          s1.restore();
+        }
+
 
       }
 
@@ -173,21 +198,46 @@ int main(){
       }
 
       TEST_BLOCK("Move Assignment") {
-        ManuallyDrop<S> s;
-        ManuallyDrop<S> s1 (1);
 
-        s = std::move(s1);
+        {
 
-        assertm(
-          "Move OK",
-          s.get_resource_as_pointer() != s1.get_resource_as_pointer() &&
-          s1.get_resource_as_pointer()->i_ptr == nullptr && // i_ptr moved
-          s.get_resource_as_pointer()->i_ptr != nullptr &&
-          *(s.get_resource_as_pointer()->i_ptr) == 1
-        );
+          ManuallyDrop<S> s;
+          ManuallyDrop<S> s1 (1);
 
-        // s1.restore(); // NOT NEEDED ESSENTIALLY AS IT IS MOVED INTO s
-        s.restore();
+          s = std::move(s1);
+
+          assertm(
+            "Move OK",
+            s.get_resource_as_pointer() != s1.get_resource_as_pointer() &&
+            s1.get_resource_as_pointer()->i_ptr == nullptr && // i_ptr moved
+            s.get_resource_as_pointer()->i_ptr != nullptr &&
+            *(s.get_resource_as_pointer()->i_ptr) == 1
+          );
+
+          // s1.restore(); // NOT NEEDED ESSENTIALLY AS IT IS MOVED INTO s
+          s.restore();
+        }
+
+        {
+
+          ManuallyDrop<S> s (2);
+          ManuallyDrop<S> s1 (1);
+
+          // RESTORE REQUIRED BEFORE COPY/MOVE ASSIGNMENT SINCE THERE IS NO IMPLICIT DESTRUCTION
+          s.restore(); 
+          s = std::move(s1);
+
+          assertm(
+            "Move OK",
+            s.get_resource_as_pointer() != s1.get_resource_as_pointer() &&
+            s1.get_resource_as_pointer()->i_ptr == nullptr && // i_ptr moved
+            s.get_resource_as_pointer()->i_ptr != nullptr &&
+            *(s.get_resource_as_pointer()->i_ptr) == 1
+          );
+
+          // s1.restore(); // NOT NEEDED ESSENTIALLY AS IT IS MOVED INTO s
+          s.restore();
+        }
 
       }
 

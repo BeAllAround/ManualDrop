@@ -51,7 +51,7 @@ class ManuallyDrop {
 
     ManuallyDrop& operator=(const ManuallyDrop<T> & other) {
         // Equivalent to the respective operator=(const T&)
-        u.t.~T(); // TODO: Should this actually be allowed?
+        // u.t.~T(); // NOTE: Should not be technically allowed
 
         new(&u.t) T(other.u.t);
 
@@ -61,7 +61,7 @@ class ManuallyDrop {
 
     ManuallyDrop& operator=(ManuallyDrop<T> && other) {
         // Equivalent to the respective operator=(T&&)
-        u.t.~T(); // TODO: Should this actually be allowed?
+        // u.t.~T(); // NOTE: Should not be technically allowed
 
         new(&u.t) T(std::move(other));
 
