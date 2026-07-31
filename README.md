@@ -10,7 +10,7 @@ Just dump the `ManualDrop.hpp` header into your project and you are good to go!
 
 
 
-Examples include:
+# Examples
 
 ## Manual Restoration
 
