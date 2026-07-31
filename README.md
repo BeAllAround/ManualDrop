@@ -1,6 +1,6 @@
 # C++ Manual Drop
 
-`ManualDrop<T>` enables you to entirely "drop" the implicit destructor of `T` RAII with the capability to invoke it explicitly or adopt it into another RAII-based object.
+`ManualDrop<T>` enables you to entirely "drop" the implicit destructor of `T` RAII with the capability to invoke it explicitly or move it into another RAII-based object.
 
 ## Installation
 
@@ -43,7 +43,7 @@ S(const S&)
 
 
 
-## Adopting it into RAII
+## Moving it under RAII ownership
 
 ```cpp
 ManuallyDrop<S> s (1);

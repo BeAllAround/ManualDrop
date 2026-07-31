@@ -241,7 +241,7 @@ int main(){
 
       }
 
-      TEST_BLOCK("Adopt the RAII into another entity OK") {
+      TEST_BLOCK("Moving it under RAII ownership OK") {
         ManuallyDrop<S> s (1);
         S s1 = std::move(s); // operator T&&() Triggered here
 
