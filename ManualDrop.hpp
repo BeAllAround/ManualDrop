@@ -33,7 +33,7 @@ class ManuallyDrop {
         */
     }
 
-    // NOTE: Making this constructor explicit so as not to conflict with the copy/move constructor below
+    // NOTE: Making this constructor explicit so as not to cause conflict/ambiguity with the copy/move constructor below
     template <typename... Args>
     explicit ManuallyDrop(Args &&...args)
     {
