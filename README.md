@@ -2,6 +2,12 @@
 
 `ManualDrop<T>` enables you to entirely "drop" the implicit destructor of `T` RAII with the capability to invoke it explicitly or adopt it into another RAII-based object.
 
+## Installation
+
+Just dump the `ManualDrop.hpp` header into your project and you are good to go!
+
+
+
 
 
 Examples include:
