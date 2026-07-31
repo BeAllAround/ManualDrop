@@ -1,5 +1,6 @@
-
 #include <iostream>
+
+#include <vector>
 
 #include <cstddef>
 #include <cassert>
@@ -258,6 +259,31 @@ int main(){
 
       }
 
+    }
+
+
+    TEST_BLOCK("Guaranteed MOVE out of the scope") {
+      std::vector<S> v;
+
+      ManuallyDrop<S> s (10);
+
+
+      v.push_back(
+        std::move(s)
+      );
+
+      assertm(
+        "S moved OK", 
+        v[0].i_ptr != nullptr &&
+        *(v[0].i_ptr) == 10
+      );
+
+      // Output
+      /*
+      S(int)
+      S(S&&)
+      ~S() // Only one destructor invoked of the ~std::vector<S> "RAII" as the s is guaranteed to be moved
+      */
     }
 
     return 0;

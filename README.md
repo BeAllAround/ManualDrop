@@ -2,6 +2,33 @@
 
 `ManualDrop<T>` enables you to entirely "drop" the implicit destructor of `T` RAII with the capability to invoke it explicitly or move it into another RAII-based object.
 
+One of the recommended use cases is when an object is guaranteed to be moved out of the scope, so that no additional destructor [overhead] call is invoked for it.
+
+For example,
+
+```cpp
+{
+  std::vector<S> v;
+
+  ManuallyDrop<S> s (10);
+
+  v.push_back(
+    std::move(s)
+  );
+
+  // Output
+  /*
+  S(int)
+  S(S&&)
+  ~S() // Only one destructor invoked of the ~std::vector<S> "RAII" as the s is guareeted to be moved
+  */
+}
+```
+
+
+
+
+
 ## Installation
 
 Just dump the `ManualDrop.hpp` header into your project and you are good to go!
