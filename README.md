@@ -2,7 +2,7 @@
 
 `ManualDrop<T>` enables you to entirely "drop" the implicit destructor of `T` RAII with the capability to invoke it explicitly or move it into another RAII-based object.
 
-One of the recommended use cases is when an object is guaranteed to be moved out of the scope, so that no additional destructor [overhead] call is invoked for it.
+One of the recommended use cases is when an object is guaranteed to be moved out of the scope, so that no additional destructor [potentially overhead] call is invoked for it.
 
 For example,
 
