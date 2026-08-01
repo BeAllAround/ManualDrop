@@ -27,7 +27,7 @@ class S {
     i_ptr = new int(*other.i_ptr);
   }
 
-  // NOTE: std::vector will invoke the copy constructor during reallocation, but only if the element's move constructor is not marked noexcept
+  // NOTE: For example, std::vector will invoke the copy constructor during reallocation, but only if the element's move constructor is not marked noexcept
   S(S&& other) noexcept
   {
     std::cout << "S(S&&)" << std::endl;
@@ -287,6 +287,44 @@ int main(){
       S(S&&)
       ~S() // Only one destructor invoked of the ~std::vector<S> "RAII" as the s is guaranteed to be moved
       */
+    }
+
+
+    // Compare the outputs of these two
+    {
+      TEST_BLOCK("S RAII Output | Vector reallocation move + destructor") {
+        using _S = S;
+
+        std::vector<_S> v;
+        v.reserve(10);
+
+        for(size_t i = 0; i < 12; i++) {
+          _S item (i);
+          v.push_back(std::move(item));
+        }
+
+      }
+
+      TEST_BLOCK("Moveable<S> RAII Output | Vector reallocation move + destructor") {
+        using _S = Moveable<S>;
+
+        std::vector<_S> v;
+        v.reserve(10);
+
+        for(size_t i = 0; i < 12; i++) {
+          _S item (i);
+          v.push_back(std::move(item));
+        }
+
+        defer: {
+
+          for(auto start = v.begin(); start != v.end(); start++) {
+            (*start).restore();
+          }
+
+        }
+      }
+
     }
 
     return 0;

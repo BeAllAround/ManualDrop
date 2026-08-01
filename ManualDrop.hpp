@@ -58,7 +58,9 @@ class ManuallyDrop {
         new(&u.t) T(other.u.t);
     }
 
-    ManuallyDrop(ManuallyDrop<T> && other) {
+    // NOTE: For example, std::vector will invoke the copy constructor during reallocation, but only if the element's move constructor is not marked noexcept
+    ManuallyDrop(ManuallyDrop<T> && other) noexcept
+    {
         new(&u.t) T(std::move(other.u.t));
     }
 
