@@ -89,6 +89,9 @@ int _defer_block_print(const std::string& block_name) {
 
 #define TEST_BLOCK(block_name) for(int i = _block_print(block_name); i < 1; i++, _defer_block_print(block_name))
 
+template<class T>
+using Moveable = ManuallyDrop<T>;
+
     
 int main(){
 
@@ -265,7 +268,7 @@ int main(){
     TEST_BLOCK("Guaranteed MOVE out of the scope") {
       std::vector<S> v;
 
-      ManuallyDrop<S> s (10);
+      Moveable<S> s (10);
 
 
       v.push_back(

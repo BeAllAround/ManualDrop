@@ -7,10 +7,13 @@ One of the recommended use cases is when an object is guaranteed to be moved out
 For example,
 
 ```cpp
+template<class T>
+using Moveable = ManuallyDrop<T>;
+
 {
   std::vector<S> v;
 
-  ManuallyDrop<S> s (10);
+  Moveable<S> s (10);
 
   v.push_back(
     std::move(s)

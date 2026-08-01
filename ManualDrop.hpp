@@ -1,3 +1,16 @@
+/**
+ * @author Alex Milenkovic
+ *
+ * Copyright 2026, Alex Milenkovic. All rights reserved.
+ * Use of this source code is governed by the MIT license
+ * that can be found in the LICENSE file.
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+
+
+
 // NOTE: In case, some compilers don't support always_inline as the same macro
 #define __force_inline __attribute__((always_inline))
 
