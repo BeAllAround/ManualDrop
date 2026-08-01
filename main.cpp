@@ -290,7 +290,7 @@ int main(){
     }
 
 
-    // Compare the outputs of these two
+    // Compare the RAII outputs of these two
     {
       TEST_BLOCK("S RAII Output | Vector reallocation move + destructor") {
         using _S = S;

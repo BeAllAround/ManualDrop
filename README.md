@@ -136,3 +136,43 @@ delete s1_p_i;
 }
 ```
 
+
+
+## Buffer Reallocation RAII Improvements
+
+```cpp
+// Compare the RAII outputs of these two from the main.cpp test suite
+{
+  BLOCK("S RAII Output | Vector reallocation move + destructor") {
+    std::vector<S> v;
+    v.reserve(10);
+
+    for(size_t i = 0; i < 12; i++) {
+      S item (i);
+      v.push_back(std::move(item));
+    }
+
+  }
+
+  BLOCK("Moveable<S> RAII Output | Vector reallocation move + destructor") {
+    std::vector<Moveable<S>> v;
+    v.reserve(10);
+
+    for(size_t i = 0; i < 12; i++) {
+      Moveable<S> item (i);
+      v.push_back(std::move(item));
+    }
+
+    defer: {
+
+      for(auto start = v.begin(); start != v.end(); start++) {
+        (*start).restore();
+      }
+
+    }
+  }
+
+}
+
+```
+
