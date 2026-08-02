@@ -20,9 +20,9 @@ One of the recommended use cases is when an object is guaranteed to be moved out
 
 This "potential" overhead mostly involves expensive situations where the `~T()` destructor cannot be inlined so you are saving:
 
-- one branch to the destructor
-- one return
-- whatever the destructor itself checks
+- **a destructor call** - one branch to the destructor
+- **the associated call/return overhead** - one return
+- **any work performed by a moved-from destructor** - whatever the destructor itself checks
 
 For example,
 
