@@ -125,9 +125,14 @@ class ManuallyDrop {
         drop();
     }
 
+    // Even with an empty body, this destructor is considered to be non-trivial
+    /*
     ~ManuallyDrop() __force_inline
     {
-
     }
+    */
+
+    // Trivial destructor, explicitly defaulted
+    ~ManuallyDrop() = default;
 
 };

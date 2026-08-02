@@ -2,9 +2,17 @@
 
 `ManualDrop<T>` enables you to entirely "drop" the implicit destructor of `T` RAII with the capability to invoke it explicitly or move it into another RAII-based object.
 
+`ManuallyDrop<T>` eliminates the destructor call for objects whose lifetime is known to end via transfer of ownership rather than scope exit. This can reduce overhead when destructors are non-trivial or cannot be optimized away, particularly in low-level containers, allocators, and performance-critical code.
+
 This library is a utility for explicitly separating object lifetime from storage lifetime.
 
 One of the recommended use cases is when an object is guaranteed to be moved out of the scope, so that no additional destructor [potentially overhead in some cases] call is invoked for it.
+
+This "potential" overhead mostly involves expensive situations where the `~T()` destructor cannot be inlined so you are saving:
+
+- one branch to the destructor
+- one return
+- whatever the destructor itself checks
 
 For example,
 
@@ -27,6 +35,20 @@ using Moveable = ManuallyDrop<T>;
   S(S&&)
   ~S() // Only one destructor invoked by the ~std::vector<S>() "RAII" as the s is guareeted to be moved
   */
+}
+```
+
+
+
+### Types with expensive moved-from destructors
+
+Some libraries don't bother making moved-from destruction cheap.
+
+For example, even after moving, we end up with:
+
+```cpp
+~S() {
+    unregister_from_global_registry();
 }
 ```
 
