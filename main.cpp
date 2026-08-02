@@ -292,7 +292,7 @@ int main(){
 
     // Compare the RAII outputs of these two
     {
-      TEST_BLOCK("S RAII Output | Vector reallocation move + destructor") {
+      TEST_BLOCK("S RAII Output | Vector push_back reallocation move + destructor") {
         using _S = S;
 
         std::vector<_S> v;
@@ -305,7 +305,7 @@ int main(){
 
       }
 
-      TEST_BLOCK("Moveable<S> RAII Output | Vector reallocation move + destructor") {
+      TEST_BLOCK("Moveable<S> RAII Output | Vector push_back reallocation move + destructor") {
         using _S = Moveable<S>;
 
         std::vector<_S> v;
@@ -317,6 +317,41 @@ int main(){
         }
 
         defer: {
+
+          for(auto start = v.begin(); start != v.end(); start++) {
+            (*start).restore();
+          }
+
+        }
+      }
+
+    }
+
+    // Compare the RAII outputs of these two
+    {
+      TEST_BLOCK("S RAII Output | Vector emplace_back reallocation move + destructor") {
+        using _S = S;
+
+        std::vector<_S> v;
+        v.reserve(10);
+
+        for(size_t i = 0; i < 12; i++) {
+          v.emplace_back(i);
+        }
+
+      }
+
+      TEST_BLOCK("Moveable<S> RAII Output | Vector emplace_back reallocation move + destructor") {
+        using _S = Moveable<S>;
+
+        std::vector<_S> v;
+        v.reserve(10);
+
+        for(size_t i = 0; i < 12; i++) {
+          v.emplace_back(i);
+        }
+
+        _defer: {
 
           for(auto start = v.begin(); start != v.end(); start++) {
             (*start).restore();
