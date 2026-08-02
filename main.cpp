@@ -112,7 +112,8 @@ int main(){
 
       assertm(
         "Detached on-heap members of S not cleaned up", 
-        s_p_i == nullptr &&
+        s_p_i == nullptr // ManualDrop() OK AND T() INTIALIZED!
+        &&
         *(s1_p_i) == 1
       );
 
