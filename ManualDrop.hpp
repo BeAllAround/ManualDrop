@@ -126,6 +126,7 @@ class ManuallyDrop {
     }
 
     // Even with an empty body, this destructor is considered to be non-trivial
+    // However, it will be NOP nonetheless.
     /*
     ~ManuallyDrop() __force_inline
     {
@@ -133,6 +134,7 @@ class ManuallyDrop {
     */
 
     // Trivial destructor, explicitly defaulted
+    // Note: Optimized away as a CALL -> NOP from -O1 optimization levels on
     ~ManuallyDrop() = default;
 
 };
