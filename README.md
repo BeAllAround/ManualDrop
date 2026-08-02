@@ -18,7 +18,9 @@ This library is a utility for explicitly separating object lifetime from storage
 
 One of the recommended use cases is when an object is guaranteed to be moved out of the scope, so that no additional destructor [potentially overhead in some cases] call is invoked for it.
 
-This "potential" overhead mostly involves expensive situations where the `~T()` destructor cannot be inlined so you are saving:
+This "potential" overhead mostly involves expensive situations where the `~T()` destructor cannot be inlined. E.g. destructors based on system calls, virtual destructors, etc.
+
+So you are saving:
 
 - **a destructor call** - one branch to the destructor
 - **the associated call/return overhead** - one return
