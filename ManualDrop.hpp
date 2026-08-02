@@ -115,9 +115,14 @@ class ManuallyDrop {
     }
 
 
-    void restore() __force_inline
+    void drop() __force_inline
     {
         u.t.~T();
+    }
+
+    void destroy() __force_inline
+    {
+        drop();
     }
 
     ~ManuallyDrop() __force_inline

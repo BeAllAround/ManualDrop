@@ -137,8 +137,8 @@ int main(){
           *(s.get_resource_as_pointer()->i_ptr) == *(s1.get_resource_as_pointer()->i_ptr)
         );
 
-        s.restore();
-        s1.restore();
+        s.drop();
+        s1.drop();
 
       }
 
@@ -157,8 +157,8 @@ int main(){
             *(s.get_resource_as_pointer()->i_ptr) == *(s1.get_resource_as_pointer()->i_ptr)
           );
 
-          s.restore();
-          s1.restore();
+          s.drop();
+          s1.drop();
         }
 
 
@@ -166,8 +166,8 @@ int main(){
           ManuallyDrop<S> s (2);
           ManuallyDrop<S> s1 (1);
 
-          // RESTORE REQUIRED BEFORE COPY/MOVE ASSIGNMENT SINCE THERE IS NO IMPLICIT DESTRUCTION
-          s.restore(); 
+          // DROP REQUIRED BEFORE COPY/MOVE ASSIGNMENT SINCE THERE IS NO IMPLICIT DESTRUCTION
+          s.drop(); 
           s = s1;
 
           assertm(
@@ -177,8 +177,8 @@ int main(){
             *(s.get_resource_as_pointer()->i_ptr) == *(s1.get_resource_as_pointer()->i_ptr)
           );
 
-          s.restore();
-          s1.restore();
+          s.drop();
+          s1.drop();
         }
 
 
@@ -197,8 +197,8 @@ int main(){
           *(s1.get_resource_as_pointer()->i_ptr) == 1
         );
 
-        // s.restore(); // NOT NEEDED ESSENTIALLY AS IT IS MOVED INTO s1
-        s1.restore();
+        // s.drop(); // NOT NEEDED ESSENTIALLY AS IT IS MOVED INTO s1
+        s1.drop();
 
       }
 
@@ -219,8 +219,8 @@ int main(){
             *(s.get_resource_as_pointer()->i_ptr) == 1
           );
 
-          // s1.restore(); // NOT NEEDED ESSENTIALLY AS IT IS MOVED INTO s
-          s.restore();
+          // s1.drop(); // NOT NEEDED ESSENTIALLY AS IT IS MOVED INTO s
+          s.drop();
         }
 
         {
@@ -228,8 +228,8 @@ int main(){
           ManuallyDrop<S> s (2);
           ManuallyDrop<S> s1 (1);
 
-          // RESTORE REQUIRED BEFORE COPY/MOVE ASSIGNMENT SINCE THERE IS NO IMPLICIT DESTRUCTION
-          s.restore(); 
+          // DROP REQUIRED BEFORE COPY/MOVE ASSIGNMENT SINCE THERE IS NO IMPLICIT DESTRUCTION
+          s.drop(); 
           s = std::move(s1);
 
           assertm(
@@ -240,8 +240,8 @@ int main(){
             *(s.get_resource_as_pointer()->i_ptr) == 1
           );
 
-          // s1.restore(); // NOT NEEDED ESSENTIALLY AS IT IS MOVED INTO s
-          s.restore();
+          // s1.drop(); // NOT NEEDED ESSENTIALLY AS IT IS MOVED INTO s
+          s.drop();
         }
 
       }
@@ -259,7 +259,7 @@ int main(){
 
 
         // Implicit s1.~S() invoked
-        // Thus, s.restore() is not needed
+        // Thus, s.drop() is not needed
 
       }
 
@@ -320,7 +320,7 @@ int main(){
         defer: {
 
           for(auto start = v.begin(); start != v.end(); start++) {
-            (*start).restore();
+            (*start).drop();
           }
 
         }
@@ -355,7 +355,7 @@ int main(){
         _defer: {
 
           for(auto start = v.begin(); start != v.end(); start++) {
-            (*start).restore();
+            (*start).drop();
           }
 
         }

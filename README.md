@@ -2,7 +2,9 @@
 
 `ManualDrop<T>` enables you to entirely "drop" the implicit destructor of `T` RAII with the capability to invoke it explicitly or move it into another RAII-based object.
 
-One of the recommended use cases is when an object is guaranteed to be moved out of the scope, so that no additional destructor [potentially overhead] call is invoked for it.
+This library is a utility for explicitly separating object lifetime from storage lifetime.
+
+One of the recommended use cases is when an object is guaranteed to be moved out of the scope, so that no additional destructor [potentially overhead in some cases] call is invoked for it.
 
 For example,
 
@@ -42,7 +44,7 @@ Just dump the `ManualDrop.hpp` header into your project and you are good to go!
 
 # Examples
 
-## Manual Restoration
+## Manual Destroy
 
 ```cpp
 class S {
@@ -59,8 +61,8 @@ ManuallyDrop<S> s (1); // S(int)
 ManuallyDrop<S> s1 = s; // S(const S&)
 
 
-s.restore(); // Trigger s.~S()
-s1.restore(); // Trigger s1.~S()
+s.drop(); // Trigger s.~S()
+s1.drop(); // Trigger s1.~S()
 
 // Output
 /*
@@ -81,7 +83,7 @@ S s1 = std::move(s); // [Implicit] Contextual conversion to S&& (operator S&&())
 
 
 // Implicit s1.~S() invoked
-// Thus, s.restore() is not needed
+// Thus, s.drop() is not needed
 
 // Output
 /*
@@ -127,12 +129,12 @@ delete s1_p_i;
 {
   ManuallyDrop<S> s (2);
   ManuallyDrop<S> s1 (1);
-  // RESTORE REQUIRED (IF INITIALIZED) BEFORE COPY/MOVE ASSIGNMENT SINCE THERE IS NO IMPLICIT DESTRUCTION
-  s.restore(); 
+  // DROP REQUIRED (IF INITIALIZED) BEFORE COPY/MOVE ASSIGNMENT SINCE THERE IS NO IMPLICIT DESTRUCTION
+  s.drop(); 
   s = std::move(s1);
 
-  // s1.restore(); // NOT NEEDED ESSENTIALLY AS IT IS MOVED INTO s
-  s.restore();
+  // s1.drop(); // NOT NEEDED ESSENTIALLY AS IT IS MOVED INTO s
+  s.drop();
 }
 ```
 
@@ -166,7 +168,7 @@ delete s1_p_i;
     defer: {
 
       for(auto start = v.begin(); start != v.end(); start++) {
-        (*start).restore();
+        (*start).drop();
       }
 
     }
