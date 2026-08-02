@@ -100,9 +100,11 @@ int main(){
       int* s_p_i { nullptr };
       int* s1_p_i { nullptr };
 
+      TEST_BLOCK("No Implicit Destruction")
+      // Separate Block
       {
         ManuallyDrop<S> s;
-        ManuallyDrop<S> s1 (1);
+        ManuallyDrop<S> s1 (110);
 
         s_p_i = s.get_resource_as_pointer()->i_ptr;
 
@@ -111,10 +113,10 @@ int main(){
       }
 
       assertm(
-        "Detached on-heap members of S not cleaned up", 
+        "Detached (non-trivial) on-heap members of S still alive as opposed to having been cleaned up", 
         s_p_i == nullptr // ManualDrop() OK AND T() INTIALIZED!
         &&
-        *(s1_p_i) == 1
+        *(s1_p_i) == 110 // Not destroyed by ~ManuallyDrop() OK
       );
 
       // Heap deallocation of the detached int*

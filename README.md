@@ -10,7 +10,7 @@ The source code of this library can be found at: https://github.com/BeAllAround/
 
 ## Overview
 
-`ManualDrop<T>` enables you to entirely "drop" the implicit destructor of `T` RAII with the capability to invoke it explicitly or move it into another RAII-based object.
+`ManuallyDrop<T>` enables you to entirely "drop" the implicit destructor of `T` RAII with the capability to invoke it explicitly or move it into another RAII-based object.
 
 `ManuallyDrop<T>` eliminates the destructor call for objects whose lifetime is known to end via transfer of ownership rather than scope exit. This can reduce overhead when destructors are non-trivial or cannot be optimized away, particularly in low-level containers, allocators, and performance-critical code.
 
