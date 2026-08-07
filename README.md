@@ -181,6 +181,10 @@ A broader issue arises when returning a `prvalue` from a function: `emplace_back
 For example:
 
 ```cpp
+S make_s(/* ... */);
+
+ManuallyDrop<S> make_droppable_s(/* ... */);
+
 {
   TEST_BLOCK("Function Prvalue (Return Value Optimization)") {
     std::vector<S> v;
