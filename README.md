@@ -174,6 +174,44 @@ delete s1_p_i;
 
 
 
+## Function RVO
+
+A broader issue arises when returning a prvalue from a function:`emplace_back` (or similar placement-new helpers) cannot construct the object in place unless the arguments are built step by step.
+
+For example:
+
+```cpp
+{
+  TEST_BLOCK("Function Prvalue (Return Value Optimization)") {
+    std::vector<S> v;
+
+    v.push_back(make_s());
+    /*
+    S(int)
+    S(S&&)
+    ~S()
+    ~S()
+    */
+  }
+
+  TEST_BLOCK("ManuallyDrop<S> Function Prvalue (Return Value Optimization)") {
+    std::vector<S> v;
+
+    v.push_back(make_droppable_s());
+	/*
+	S(int)
+	S(S&&)
+	~S()
+	*/
+  }
+
+}
+```
+
+
+
+
+
 ## Buffer Reallocation RAII Improvements
 
 ```cpp

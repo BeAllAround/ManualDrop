@@ -92,6 +92,14 @@ int _defer_block_print(const std::string& block_name) {
 template<class T>
 using Moveable = ManuallyDrop<T>;
 
+
+S make_s() {
+  return S(1);
+}
+
+ManuallyDrop<S> make_droppable_s(){
+  return ManuallyDrop<S>(1);
+}
     
 int main(){
 
@@ -361,6 +369,25 @@ int main(){
           }
 
         }
+      }
+
+    }
+
+    // Function RVO prvalue
+    // Also, the bigger scope of the problem is returning a prvalue from a function where emplace_back can't do much unless we build arguments function by function.
+    {
+      TEST_BLOCK("Function Prvalue") {
+        std::vector<S> v;
+
+        v.push_back(make_s());
+
+      }
+
+      TEST_BLOCK("ManuallyDrop<S> Function Prvalue") {
+        std::vector<S> v;
+
+        v.push_back(make_droppable_s());
+
       }
 
     }
