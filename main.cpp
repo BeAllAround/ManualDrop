@@ -379,14 +379,14 @@ int main(){
       TEST_BLOCK("Function Prvalue") {
         std::vector<S> v;
 
-        v.push_back(make_s());
+        v.push_back(make_s(/* ... */));
 
       }
 
       TEST_BLOCK("ManuallyDrop<S> Function Prvalue") {
         std::vector<S> v;
 
-        v.push_back(make_droppable_s());
+        v.push_back(make_droppable_s(/* ... */));
 
       }
 
