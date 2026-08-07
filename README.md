@@ -176,7 +176,7 @@ delete s1_p_i;
 
 ## Function RVO
 
-A broader issue arises when returning a `prvalue` from a function:`emplace_back` (or similar placement-new helpers) cannot construct the object in place unless the arguments are built step by step.
+A broader issue arises when returning a `prvalue` from a function: `emplace_back` (or similar placement-new helpers) cannot construct the object in place unless the arguments are built step by step.
 
 For example:
 
