@@ -369,6 +369,7 @@ int main(){
           }
 
         }
+
       }
 
     }
@@ -387,6 +388,21 @@ int main(){
         std::vector<S> v;
 
         v.push_back(make_droppable_s(/* ... */));
+
+      }
+
+      TEST_BLOCK("vector<ManuallyDrop<S>> Function Prvalue") {
+        std::vector<ManuallyDrop<S>> v;
+
+        v.push_back(make_droppable_s(/* ... */));
+
+        __defer: {
+
+          for(auto start = v.begin(); start != v.end(); start++) {
+            (*start).drop();
+          }
+
+        }
 
       }
 
