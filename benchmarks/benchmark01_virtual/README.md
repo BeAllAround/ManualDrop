@@ -1,22 +1,22 @@
-sudo perf stat -r 100 -e cycles:u -e instructions:u ./raii.out # A hundred runs with -r 100
+sudo taskset -c 2 perf stat -r 100 -e cycles:u -e instructions:u ./raii.out
 
  Performance counter stats for './raii.out' (100 runs):
 
-          56391076      cpu_atom/cycles:u/                                                      ( +-  5,43% )  (2,56%)
-          86838493      cpu_core/cycles:u/                                                      ( +-  0,49% )  (97,44%)
-         139283621      cpu_atom/instructions:u/         #    2,47  insn per cycle              ( +-  7,57% )  (2,56%)
-         406888966      cpu_core/instructions:u/         #    4,69  insn per cycle              ( +-  0,60% )  (97,44%)
+     <not counted>      cpu_atom/cycles:u/                                                      (0,00%)
+          81947837      cpu_core/cycles:u/                                                      ( +-  0,10% )
+     <not counted>      cpu_atom/instructions:u/                                                (0,00%)
+         384757437      cpu_core/instructions:u/         #    4,70  insn per cycle              ( +-  0,00% )
 
-          0,068489 +- 0,000504 seconds time elapsed  ( +-  0,74% )
+          0,056722 +- 0,000134 seconds time elapsed  ( +-  0,24% )
 
-sudo perf stat -r 100 -e cycles:u -e instructions:u ./manualdrop.out # A hundred runs -r 100
+sudo taskset -c 2 perf stat -r 100 -e cycles:u -e instructions:u ./manualdrop.out
 
  Performance counter stats for './manualdrop.out' (100 runs):
 
-          53880216      cpu_atom/cycles:u/                                                      ( +-  5,35% )  (32,82%)
-          82116212      cpu_core/cycles:u/                                                      ( +-  0,57% )  (67,18%)
-         131816809      cpu_atom/instructions:u/         #    2,45  insn per cycle              ( +-  7,67% )  (32,82%)
-         396484880      cpu_core/instructions:u/         #    4,83  insn per cycle              ( +-  0,51% )  (67,18%)
+     <not counted>      cpu_atom/cycles:u/                                                      (0,00%)
+          77071071      cpu_core/cycles:u/                                                      ( +-  0,07% )
+     <not counted>      cpu_atom/instructions:u/                                                (0,00%)
+         376757448      cpu_core/instructions:u/         #    4,89  insn per cycle              ( +-  0,00% )
 
-          0,066746 +- 0,000510 seconds time elapsed  ( +-  0,76% )
+          0,054394 +- 0,000109 seconds time elapsed  ( +-  0,20% )
 
