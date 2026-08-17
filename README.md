@@ -62,6 +62,12 @@ For example, even after moving, we end up with:
 ~S() {
     unregister_from_global_registry();
 }
+
+// OR
+
+~S() {
+    unload_all_dl_references(); // dlopen + dlclose checks
+}
 ```
 
 
